@@ -138,7 +138,7 @@ h2{font-size:1.04rem;margin-bottom:8px}
 .install-promo{left:7px;bottom:7px;width:calc(100% - 14px);background:#17304c;color:white;border:1px solid #75a5d1}
 .next-promo{background:transparent}
 .story-links-title{margin:12px 0 0}
-/* 画像広告のサイズ。画像ファイルは media/ フォルダーに入っています。 */
+/* 画像広告のサイズ。画像は pictures/ フォルダーに入っています。 */
 .promo-photo{display:block;width:100%;height:auto;aspect-ratio:2.4/1;object-fit:cover;object-position:center 35%;border-radius:4px;margin:5px 0}
 .native .promo-photo{margin-top:7px}
 .photo-promo{bottom:53px;right:7px;width:310px;background:#fff;color:#173648;border:1px solid #8096a3}
@@ -155,6 +155,12 @@ a.promo-action{display:inline-block}
 .runaway-modal .promo-title{min-height:32px}
 .runaway-modal .promo-close{position:absolute;z-index:1;top:14px;right:12px}
 @media(prefers-reduced-motion:reduce){.link-toast{animation:none}}
+/* 同じファイルを別タブで開いた際の商品ページ */
+.item-page{width:min(calc(100% - 32px),680px);margin:32px auto;background:#fff;color:#192b33;border-radius:10px;overflow:hidden}
+.item-page .promo-photo{width:100%;display:block;aspect-ratio:2;object-fit:cover;border-radius:0;margin:0}
+.item-copy{padding:clamp(18px,5vw,38px)}
+.item-copy h1{line-height:1.25;margin:10px 0 16px}
+.item-copy small{color:#53666d}
 </style>
 </head>
 <body>
@@ -181,7 +187,7 @@ a.promo-action{display:inline-block}
         <nav class="nav" id="sections" aria-label="ニュースのカテゴリ"></nav>
         <article id="page" aria-label="夕刊みなとの記事"></article>
       </div>
-      <!-- ニュースの上に表示する広告。クリック先は offers/ にあります。 -->
+      <!-- ニュースの上に表示する広告。クリック先もこのHTMLで表示します。 -->
       <div class="layer" id="layer" aria-label="サイト内広告"></div>
     </div>
   </section>
@@ -327,7 +333,7 @@ const ads = {
   toothbrush:['ソニック歯ブラシ研究所','歯みがきの時間をスマホで確認できる、架空の電動歯ブラシです。','電動歯ブラシ 期間限定セール'],
   virus:['パソコン元気堂','「お使いのPC」はゲーム内の画面です。こちらは偽警告から誘導された架空の広告です。','今すぐ修復']
 };
-// 画像付き商品を増やすときは、ads と adImages に同じIDを追加し、画像を media/ に置きます。
+// 画像付き商品を増やすときは、ads と adImages に同じIDを追加し、画像を pictures/ に置き、ファイル名を adImages に入れます。
 const adImages = {
   insurance:'insurance.webp',
   career:'career.webp',
@@ -455,11 +461,11 @@ function start() {
   if (Math.random() < .8 * settings.adFrequency) spawnSticky();
   scheduleAd(randomInt(...settings.firstAdDelay));
 }
-// 新しいタブはブラウザー標準のリンクで開きます。広告IDと同名のHTMLを用意してください。
+// 新しいタブはブラウザー標準のリンクで開きます。同じHTMLを商品ページとして表示します。
 function adLink(className, id, text) {
   const link = element('a', className, text);
   link.dataset.offer = id;
-  link.href = 'offers/' + id + '.html';
+  link.href = '?item=' + encodeURIComponent(id);
   link.target = '_blank';
   link.rel = 'noopener noreferrer';
   return link;
@@ -593,7 +599,7 @@ function adAction(id, text = ads[id][2]) {
 }
 function makeAdPhoto(id) {
   const image = element('img', 'promo-photo');
-  image.src = 'media/' + adImages[id];
+  image.src = 'pictures/' + adImages[id];
   image.alt = '';
   return image;
 }
@@ -917,7 +923,21 @@ get('retry').addEventListener('click', reset);
 setInterval(() => {
   if (started !== null && !finished) get('time').textContent = readTime();
 }, 250);
-reset();
+// ?item= が有効なときは、ゲームを始めずに商品の内容を表示します。
+function showItem(id) {
+  const [name, description] = ads[id];
+  const card = element('main', 'item-page');
+  const copy = element('section', 'item-copy');
+  copy.append(element('small', '', '広告'), element('h1', '', name), element('p', '', description),
+    element('small', '', 'ゲーム内の架空の広告ページです。'));
+  if (adImages[id]) card.append(makeAdPhoto(id));
+  card.append(copy);
+  document.title = name;
+  document.body.replaceChildren(card);
+}
+const itemId = new URLSearchParams(window.location.search).get('item');
+if (Object.hasOwn(ads, itemId)) showItem(itemId);
+else reset();
 </script>
 </body>
 </html>
