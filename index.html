@@ -1,0 +1,923 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>どこ押すねん｜夕刊みなと</title>
+<style>
+/* 色は :root、端末の横幅は .stage.playing と .phone で調整できます。 */
+:root{color-scheme:light;--ink:#202727;--night:#141b22;--blue:#244558;--paper:#f8f5ed;--green:#d4f99b}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:radial-gradient(ellipse at 48% 0,#354751,#141b22 70%);color:#eff4f5;min-height:100vh;font:15px/1.65 "Noto Sans JP",Meiryo,sans-serif}
+button,input{font:inherit}
+button{cursor:pointer}
+button:disabled{cursor:default;opacity:.56}
+:focus-visible{outline:3px solid #168de4;outline-offset:3px}
+.top{max-width:1296px;margin:auto;padding:22px 24px 13px;display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap}
+.brand{font-size:1.45rem;font-weight:900;letter-spacing:.075em}
+.stats{display:flex;gap:8px;font-size:.79rem;font-variant-numeric:tabular-nums}
+.stats span{background:#202d36;border:1px solid #53636a;border-radius:5px;padding:4px 9px}
+.stage{max-width:1296px;margin:auto;padding:16px 24px 34px;display:grid;grid-template-columns:minmax(0,1fr);gap:26px;align-items:start}
+.stage.playing{grid-template-columns:300px minmax(0,1fr)}
+/* 左端末のチャット画面 */
+.phone{width:min(100%,300px);justify-self:center;border:5px solid #080d12;border-radius:30px;background:#ecf2ec;color:var(--ink);overflow:hidden;box-shadow:0 18px 42px #0006;display:flex;flex-direction:column}
+.phone-top{padding:10px 16px 11px;background:#233b37;color:white}
+.notch{width:70px;height:7px;border-radius:10px;background:#101c1b;margin:0 auto 9px}
+.contact{display:flex;align-items:center;gap:8px;font-weight:750}
+.avatar{display:grid;place-items:center;border-radius:50%;width:30px;height:30px;background:#b8d4a7;color:#183521}
+.messages{height:330px;overflow:auto;overscroll-behavior:contain;padding:15px 12px;display:flex;flex-direction:column;gap:9px}
+.bubble{align-self:flex-start;max-width:94%;border-radius:3px 13px 13px;background:#fff;padding:8px 11px;font-size:.84rem;overflow-wrap:anywhere}
+.bubble.me{align-self:flex-end;background:var(--green);border-radius:13px 3px 13px 13px}
+.bubble a{font-weight:800;color:#174d7d;text-underline-offset:3px;display:block}
+.bubble small{display:block;color:#52656b;margin-top:2px}
+.reply{background:#fff;border-top:1px solid #cddacf;padding:9px 10px}
+.reply label{font-size:.76rem;display:block;font-weight:700}
+.reply input{width:100%;min-width:0;border:1px solid #98aaa1;border-radius:6px;padding:5px 7px;font-size:16px}
+.primary{border:0;border-radius:6px;background:#214b41;color:white;padding:6px 10px;font-weight:750;white-space:nowrap}
+.result{background:#e0f3d9;padding:11px;margin-top:7px;font-size:.85rem}
+.result p{margin:0 0 7px}
+/* 右端末のニュース画面。 .scroll がサイト内のスクロール領域です。 */
+.pc{min-width:0;background:#121a20;border:3px solid #0c141a;border-radius:13px;padding:5px;box-shadow:0 22px 45px #0006;animation:arrive .35s ease-out}
+@keyframes arrive{from{opacity:0;transform:translateX(16px)}}
+.chrome{display:flex;gap:6px;align-items:center;background:#dbe2e5;color:#19262d;border-radius:7px 7px 0 0;padding:6px}
+.chrome button{border:0;background:#eef2f3;border-radius:4px;min-width:35px;min-height:32px}
+.address{flex:1;min-width:0;background:white;border-radius:4px;padding:5px 8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font:.74rem/1.7 ui-monospace,monospace}
+.screen{position:relative;isolation:isolate;background:var(--paper);color:var(--ink);height:clamp(370px,74vh,680px);overflow:hidden}
+.scroll{height:100%;overflow:auto;overscroll-behavior:contain;scrollbar-gutter:stable;padding-bottom:70px}
+.mast{padding:12px 17px;background:#203d4e;color:#fff;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.mast span,.crumb,.meta{font-size:.74rem}
+.nav{border-bottom:1px solid #bebbb1;padding:5px 16px;color:#3d4b53;font-size:.76rem}
+article{padding:17px;max-width:780px;margin:auto}
+h1,h2,p{margin-top:0}
+h1{font:900 clamp(1.4rem,4vw,2.3rem)/1.3 Georgia,"Yu Mincho",serif;margin-bottom:9px}
+h2{font-size:1.04rem;margin-bottom:8px}
+.crumb,.meta{color:#526369;margin-bottom:10px}
+.row{width:100%;text-align:left;padding:13px 7px;border:0;border-bottom:1px solid #c4c5b9;background:none;color:#213c4a;display:block}
+.row:hover{background:#e8eee9}
+.row strong,.row small{display:block}
+.story{background:#fffdf7;border:1px solid #d6d3c8;padding:13px}
+.story p:last-child{margin-bottom:0}
+.slot:empty{display:none}
+.native{width:100%;display:block;text-align:left;border:1px solid #d6d3c8;border-radius:4px;background:#fffdf7;color:#213c4a;padding:9px}
+.native strong,.native small{display:block}
+.native strong{text-decoration:underline;text-underline-offset:3px}
+.native small,.native .ad-label{color:#526369}
+.ad-label{font-size:.66rem;border:1px solid currentColor;border-radius:3px;padding:0 4px}
+.inline{margin:10px 0}
+/* 広告はニュースの上に重ね、何もない部分では記事を操作できます。 */
+.layer{position:absolute;inset:0;pointer-events:none;z-index:3;overflow:hidden}
+.layer button,.layer a{pointer-events:auto}
+.ad-close{background:#fff;color:#1a2430;border:1px solid #9c9da8;min-width:32px;min-height:32px;line-height:1;border-radius:4px;font-weight:900}
+.ad-action{border:1px solid #0004;background:#eef3f6;color:#18384c;border-radius:5px;padding:6px 10px;font-weight:900}
+.ad-card{pointer-events:auto;position:absolute;padding:11px;border-radius:8px;box-shadow:0 8px 22px #0006;max-width:calc(100% - 16px)}
+.ad-card strong{display:block;font-size:1.05rem}
+.ad-card p{margin:4px 0 8px;font-size:.82rem}
+.ad-head{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:5px}
+.sticky-ad{left:7px;bottom:7px;display:flex;padding:0;background:#e5edf2;color:#223f52}
+.sticky-ad .ad-action{background:none;border:0}
+.modal-ad{pointer-events:auto;position:absolute;inset:0;display:grid;place-items:center;background:#142130ba;padding:14px}
+.modal-ad .ad-card{position:relative;width:min(100%,375px);background:#5e1c6c;color:white;padding:15px}
+.modal-ad .ad-card strong{font-size:1.42rem}
+.slide-ad{right:7px;bottom:53px;background:#fff;color:#263047;border:1px solid #a5adba;width:285px;animation:slide .45s ease-out}
+@keyframes slide{from{transform:translateY(115%)}}
+.moving-ad{right:10px;top:64px;color:#31135b;background:linear-gradient(130deg,#ffdc55,#ff90d2 50%,#9affed);width:250px;animation:travel 2.6s ease-in-out infinite alternate}
+@keyframes travel{0%{transform:translate(0,0) rotate(-6deg)}100%{transform:translate(-28px,56px) rotate(6deg)}}
+.virus{border:2px outset #dce5ef;background:#e2e7ef;color:#171722;padding:0;width:230px;border-radius:2px;animation:arrive .16s ease-out}
+.virus .ad-head{background:#12469e;color:#fff;padding:3px 4px 3px 7px;font:700 .76rem/1.3 monospace;margin:0}
+.virus .ad-close{border-radius:0;min-width:27px;min-height:27px}
+.virus .body{padding:7px}
+.virus .body strong{color:#8d1725;font-size:.82rem}
+.virus .ad-action{font-size:.73rem;padding:3px 7px}
+@media(max-width:690px){.top,.stage{padding-inline:10px}.moving-ad{width:206px}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;scroll-behavior:auto!important}}
+.stage.playing{grid-template-columns:minmax(0,300px) minmax(0,410px);justify-content:center;align-items:start}
+.pc{width:100%;justify-self:center}
+.screen{height:clamp(350px,70dvh,620px)}
+.site-link{color:inherit;text-underline-offset:3px}
+.mast .site-link{font:900 1.45rem/1.15 Georgia,"Yu Mincho",serif;letter-spacing:.1em}
+.nav{display:flex;flex-wrap:wrap;gap:4px 12px}
+.nav .site-link,.crumb .site-link{display:inline-block;padding:3px 0}
+.crumb .site-link{color:#22516a}
+.row{display:block;text-decoration:none}
+.row strong{text-decoration:underline;text-underline-offset:3px}
+.reply select{width:100%;min-height:35px;border:1px solid #98aaa1;border-radius:6px;background:white;font:inherit;font-size:16px;padding:4px 7px}
+.field{margin:0 0 7px}
+.app-switch{display:none}
+.app-switch button{flex:1;background:#253841;color:#fff;border:1px solid #53636a;border-radius:8px;padding:8px 5px;font-weight:750}
+.app-switch button[aria-pressed="true"]{background:#d4f99b;color:#15291e;border-color:#d4f99b}
+/* 動く広告。揺れの間隔は nudge の秒数で調整できます。 */
+.sticky-ad .ad-action{animation:nudge 4.2s ease-in-out infinite}
+@keyframes nudge{0%,69%,91%,100%{transform:translateY(0)}74%,85%{transform:translateY(-5px)}79%{transform:translateY(3px)}}
+.tiny-ad{right:7px;top:94px;width:230px;background:#fffdf7;color:#233b4a;border:1px solid #a3aeb4}
+.tiny-ad .ad-close{min-width:0;min-height:0;width:15px;height:15px;padding:0;font-size:11px}
+.gross-ad{left:7px;bottom:53px;width:256px;background:#eafea7;color:#26371c;border:2px solid #546625}
+.gross-ad strong{font-size:1.22rem}
+.video-ad{right:7px;bottom:53px;width:260px;background:#191b27;color:#fff}
+.video-ad .ad-action{display:block}
+.video-ad .ad-close{min-width:50px}
+.cookies-ad{left:7px;bottom:7px;width:calc(100% - 14px);background:white;color:#1c3144;border:1px solid #8695a6}
+.cookies-ad .ad-close{min-height:24px;font-size:.7rem;background:transparent;border:0;text-decoration:underline;color:#475a69}
+/* スマホでは data-app に応じて片方の画面だけを表示します。 */
+@media(max-width:690px){
+  .stage.playing{grid-template-columns:minmax(0,410px);padding-bottom:66px}
+  .stage.playing[data-app="news"] .phone,.stage.playing[data-app="chat"] .pc{display:none}
+  .stage.playing[data-app="chat"] .phone,.stage.playing[data-app="news"] .pc{animation:app-in .24s ease-out}
+  .stage.playing .phone{width:min(100%,410px)}
+  .stage.playing .messages{height:clamp(168px,38dvh,330px)}
+  .screen{height:clamp(280px,calc(100dvh - 175px),620px)}
+  .app-switch:not([hidden]){display:flex;position:fixed;z-index:20;bottom:0;left:0;right:0;gap:8px;background:#141b22;padding:7px 12px max(7px,env(safe-area-inset-bottom))}
+}
+@keyframes app-in{from{transform:translateY(12px) scale(.98);opacity:.5}}
+
+.scroll.is-locked{overflow:hidden;touch-action:none}
+.modal-ad{z-index:3;touch-action:none}
+.support-ad{right:9px;bottom:57px;width:260px;background:#e6f7ff;color:#183852;border:1px solid #4781a0}
+.survey-ad{right:8px;top:72px;width:265px;background:#fff;color:#44284c;border:2px solid #a666af}
+.survey-ad .ad-action{margin:3px 4px 0 0}
+.install-ad{left:7px;bottom:7px;width:calc(100% - 14px);background:#17304c;color:white;border:1px solid #75a5d1}
+.next-ad{background:transparent}
+.related-heading{margin:12px 0 0}
+/* 画像広告のサイズ。画像ファイルは ads/ フォルダーに入っています。 */
+.ad-photo{display:block;width:100%;height:auto;aspect-ratio:2.4/1;object-fit:cover;object-position:center 35%;border-radius:4px;margin:5px 0}
+.native .ad-photo{margin-top:7px}
+.photo-ad{bottom:53px;right:7px;width:310px;background:#fff;color:#173648;border:1px solid #8096a3}
+.photo-ad .photo-button{width:100%;padding:0;border:0;background:none;text-align:left;color:inherit}
+.photo-ad .photo-button strong{padding:2px 0;color:#184364}
+.photo-ad .photo-button:hover strong{text-decoration:underline}
+
+a.native,a.ad-action,a.photo-button{display:block;text-decoration:none}
+a.ad-action{display:inline-block}
+.link-toast{z-index:2;bottom:7px;left:7px;width:calc(100% - 14px);background:#fff;color:#253d4d;border:1px solid #8d9eab;animation:slide .42s ease-out}
+.link-toast .ad-head{margin-bottom:3px}
+.link-toast a{display:block;color:#244f72;text-underline-offset:3px}
+.runaway-modal .ad-card{position:relative;overflow:hidden;padding-right:52px}
+.runaway-modal .ad-head{min-height:32px}
+.runaway-modal .ad-close{position:absolute;z-index:1;top:14px;right:12px}
+@media(prefers-reduced-motion:reduce){.link-toast{animation:none}}
+</style>
+</head>
+<body>
+<header class="top"><div class="brand">どこ押すねん</div><div class="stats" id="stats" hidden><span>経過 <b id="time">00:00</b></span><span>広告クリック <b id="hits">0</b>回</span></div></header>
+<!-- ゲーム本体。スマホとニュースは別の領域として作り、CSSで切り替えます。 -->
+<main id="stage" class="stage" data-app="chat">
+  <section class="phone" id="phone" aria-label="スマホのチャット">
+    <div class="phone-top"><div class="notch" aria-hidden="true"></div><div class="contact"><span class="avatar" aria-hidden="true">友</span>友人とのチャット</div></div>
+    <div class="messages" id="messages" role="log" aria-live="polite"></div>
+    <form id="reply" class="reply" hidden>
+      <div id="fields"></div>
+      <button id="send" class="primary" type="submit">送信</button>
+    </form>
+    <div id="result" class="result" hidden><p id="score"></p><button id="retry" type="button" class="primary">もう一度遊ぶ</button></div>
+  </section>
+  <section id="pc" class="pc" aria-label="PCのブラウザー" hidden>
+    <div class="chrome">
+      <button type="button" id="back" aria-label="前のページへ戻る" disabled>←</button>
+      <div id="address" class="address"></div>
+    </div>
+    <div class="screen" id="screen">
+      <div class="scroll" id="scroll">
+        <div class="mast"><a class="site-link" href="#home" data-page="home">夕刊みなと</a><span>地域のニュース</span></div>
+        <nav class="nav" id="sections" aria-label="ニュースのカテゴリ"></nav>
+        <article id="page" aria-label="夕刊みなとの記事"></article>
+      </div>
+      <!-- ニュースの上に表示する広告。クリック先は ad-pages/ にあります。 -->
+      <div class="layer" id="layer" aria-label="サイト内広告"></div>
+    </div>
+  </section>
+</main>
+<nav class="app-switch" id="app-switch" aria-label="アプリ切り替え" hidden>
+  <button type="button" id="app-chat" aria-controls="phone" aria-pressed="true">チャット</button>
+  <button type="button" id="app-news" aria-controls="pc" aria-pressed="false">ニュース</button>
+</nav>
+<script>
+'use strict';
+// 調整用の数値です。確率は 0〜1、距離は px、時間はミリ秒です。
+const settings = {
+  maxPopupKinds: 4,         // 画面に重ねられる広告の種類数。記事内の広告は別。
+  adFrequency: 0.60,         // 以前の出現頻度を1とした倍率。
+  scrollAdChance: 0.35,       // 一覧を一定距離だけ下へ読むたびに抽選。0で無効、1で毎回当選。
+  scrollAdDistance: 350,      // 何px進むごとに抽選するか。
+  scrollAdCooldown: 5000,     // モーダルを閉じてから次のスクロール広告を出せるまで。
+  firstAdDelay: [2300, 4100], // ニュースを開いてから最初のタイマー広告までの範囲。
+  timedAdDelay: [3100, 5700]  // 2回目以降のタイマー広告の間隔。
+};
+
+const get = id => document.getElementById(id);
+const pc = get('pc');
+const page = get('page');
+const scroll = get('scroll');
+const layer = get('layer');
+const messages = get('messages');
+// ニュースのカテゴリと記事データ。記事のキーは URL と関連記事にも使います。
+const categories = {events:'イベント', transit:'交通', city:'暮らし'};
+const articles = {
+  festival:{category:'events', title:'みなと灯り祭、強風で入場に一部変更', date:'きょう 12:10', paragraphs:['港公園で明日開かれる「みなと灯り祭」は、点灯を予定通り18:00から行う。強風の予報を受け、ゲート別の開場時刻と再入場の扱いは別のお知らせにまとめた。'], related:['gates','festivalOld']},
+  gates:{category:'events', title:'灯り祭の入場案内【当日版】', date:'きょう 12:30更新', paragraphs:['実行委員会は、昨日発表した開場時刻を更新した。北側ゲートは15:00、南側ゲートは{0}に開く。','再入場の受付は{1}のみ。いったん外に出た場合は、指定のゲートへ向かう。'], related:['festival']},
+  festivalOld:{category:'events', title:'灯り祭、両ゲート15時開場を予定', date:'きのう 17:00', paragraphs:['発表当初は北側・南側とも15:00に開場する予定だった。強風への対応は決まり次第、当日版に掲載する。'], related:['gates']},
+  market:{category:'events', title:'日曜の朝市、雨天のため屋内に変更', date:'きょう 10:25', paragraphs:['港町朝市は日曜も開催する。会場は屋外の中央広場から、市民交流館に変更された。出店者と一般来場者で入口が異なる。'], related:['marketGuide']},
+  marketGuide:{category:'events', title:'港町朝市の来場案内【雨天版】', date:'きょう 11:15更新', paragraphs:['一般来場者の入場は{1}から。市民交流館の{0}を利用する。','出店者の搬入は一般入口とは別の搬入口で08:30から受け付ける。'], related:['market']},
+  shuttle:{category:'transit', title:'灯り祭の臨時バス、駅前の乗り場を変更', date:'きょう 09:00', paragraphs:['港中央駅前の工事に伴い、明日の臨時バスは通常のバス停を使用しない。会場行きと駅前行きで時刻が異なる。'], related:['timetable','festival']},
+  timetable:{category:'transit', title:'臨時バスの時刻表【明日・変更後】', date:'きょう 13:30更新', paragraphs:['港中央駅 → 港公園。乗り場は駅前{1}。初便は{0}、最終便は17:20。','港公園 → 港中央駅。乗り場は公園北口。初便は18:20、最終便は21:10。'], related:['shuttle']},
+  ferry:{category:'transit', title:'夕凪フェリー、土曜は一部の便を運休', date:'きょう 08:45', paragraphs:['潮見港と南島を結ぶ夕凪フェリーは、船の点検で土曜の朝の便を一部運休する。日曜は通常どおり。'], related:['ferryNotice']},
+  ferryNotice:{category:'transit', title:'夕凪フェリー 土曜の臨時時刻表', date:'きょう 13:00更新', paragraphs:['潮見港 → 南島。07:50便は運休。運航する最初の便は{0}。','南島 → 潮見港。08:55便は通常どおり運航する。'], related:['ferry']},
+  library:{category:'city', title:'港図書館、改修で月曜から休館', date:'きょう 09:40', paragraphs:['港図書館は来週月曜から改修工事に入る。休館中も一部のサービスが使える。市の案内で受付場所と対象を確認できる。'], related:['libraryGuide']},
+  libraryGuide:{category:'city', title:'港図書館の休館中に使えるサービス', date:'きょう 12:05更新', paragraphs:['借りた本は{0}へ。CD・DVDは破損防止のため、{1}のカウンターで返却を受け付ける。','予約本の受け取りは市民交流館の臨時窓口で行う。'], related:['library']},
+  water:{category:'city', title:'水道工事、青葉町の断水予定を更新', date:'きょう 10:10', paragraphs:['青葉町の水道工事は来週火曜に行われる。作業時間、各地区の断水時間、給水車の受付時間はそれぞれ異なる。'], related:['waterGuide']},
+  waterGuide:{category:'city', title:'青葉町の断水と給水所【地区別】', date:'きょう 14:15更新', paragraphs:['青葉町1丁目の断水は10:00〜12:00。青葉町2丁目の断水は{0}〜15:00。','給水車は{1}の正面入口前で12:30から待機する。工事全体の作業時間は09:00〜17:00。'], related:['water']}
+};
+const extraArticles = [
+  // ここは検索の手掛かりや紛らわしい記事です。［ID, カテゴリ, 見出し, 配信日, 本文, 関連記事ID（省略可）］の順で追加します。
+  ['craftWeekend','events','港の手しごと市、出店者を追加','きょう 08:10','布小物、陶器、古道具の3店舗が追加された。会場は旧魚市場の2階。'],
+  ['photoWalk','events','商店街を巡る白黒写真の散歩会','きのう 15:05','集合は銀座通りの時計台前。雨の場合はアーケード内を中心に歩く。'],
+  ['lanternExhibit','events','灯り祭の提灯、郷土館で先行展示','3日前','祭りで使われる提灯のうち、修復を終えた12点が郷土館に並ぶ。展示用の入口は正面玄関。',['festival']],
+  ['clockRepair','events','海辺の時計塔で修復記念の見学会','きょう 07:50','見学会は毎回10人まで。時計の裏にある手巻き装置を案内する。'],
+  ['schoolConcert','events','市民楽団、日曜に春の演奏会','きのう 14:20','演奏会は音楽室ではなく体育館で開催する。開場は13:00。'],
+  ['guestMarket','events','港町朝市の出店者向け搬入説明会','2日前','出店者の搬入は交流館の搬入口へ。一般来場者の入口は雨天版の来場案内に掲載。',['marketGuide']],
+  ['recordFair','events','レコード交換会、出品枠に空き','きょう 11:40','倉庫街で中古盤の交換会を開く。出品は1人10枚まで。'],
+  ['flowerShow','events','坂の上広場で春の寄せ植え展','3日前','地域の園芸サークルが作った鉢を32点展示する。鉢の販売は翌週から。'],
+  ['nightMuseum','events','海事資料館の夜間開館、今年も','きのう 18:15','館内の照明を落とし、懐中電灯で船の模型を見る。受付は中庭側。'],
+  ['shortFilms','events','旧映画館で短編映画を一挙上映','4日前','地元出身者の作品を6本上映する。通し券には休憩時の飲み物が付く。'],
+  ['paperBoats','events','親子で紙の船を作る講座','2日前','作った船は風洞で走らせる。のりと定規は会場で配布する。'],
+  ['foodTickets','events','灯り祭の飲食券、先行販売は17時まで','きょう 11:10','事前販売窓口は案内所横。飲食券の販売時間と祭りの開場時刻は別。',['festival']],
+  ['artSale','events','船具倉庫を使った小さな美術展','5日前','市内の5人が、古いロープや船具を素材にした作品を出品する。'],
+  ['bookSwap','events','公民館で児童書の交換会','きのう 09:00','家で読み終えた児童書を持参すると、同じ冊数まで会場の本と交換できる。'],
+  ['busDepot','transit','市バスの車庫、月末に一般公開','2日前','整備中のバスを外から見学できる。構内での乗車体験には整理券が必要。'],
+  ['railWork','transit','海岸線の夜間工事で一部列車が区間運休','きょう 06:30','対象は平日の23時以降。終点の潮見駅までは駅前から代行車が走る。'],
+  ['busOutboundOld','transit','臨時バス、初便14:30で調整中【速報】','きのう 16:40','当初案では駅前2番から出る予定だった。工事日程の確定後、変更後の時刻表を掲載。',['timetable']],
+  ['cycleRoute','transit','運河沿いの自転車道が一部開通','4日前','南倉庫から南公園までの区間が先行開通。夜間は照明工事のため通行止め。'],
+  ['ferrySunday','transit','夕凪フェリー、日曜の朝便は通常運航','きょう 09:35','日曜の潮見港発は07:50から。土曜の運休情報は臨時時刻表を参照。',['ferryNotice']],
+  ['crossing','transit','北町踏切を半日閉鎖、歩行者は地下道へ','きのう 10:25','線路脇の機器を取り替えるため、朝から正午まで車両も通行できない。'],
+  ['schoolBus','transit','学校前を経由する路線、休暇中の運行案内','3日前','休暇中は朝の増便を取りやめる。通学時間帯以外は通常時刻のまま。'],
+  ['bridgeLane','transit','西大橋、昼間は片側交互通行','きょう 07:15','橋の継ぎ目補修により、平日の09:00〜16:00に交通誘導を行う。'],
+  ['parkingLot','transit','港公園の駐車場、南側だけ早朝開放','きのう 12:05','駐車場は07:30から。公園で行われる催しの入場ゲートとは別の施設。'],
+  ['stationElevator','transit','港中央駅の東改札、エレベーターを点検','きょう 08:50','点検中は西改札側のエレベーターへ。連絡通路は終日通れる。'],
+  ['marinaTaxi','transit','水上タクシー、予約受付を再開','4日前','桟橋の補修が完了した。夕方の運航は貸切予約のある日だけ。'],
+  ['walkingMap','transit','港中央駅から港公園までの徒歩ルート','3日前','駅の南出口から運河沿いを歩くと約18分。明日のバスは別案内。',['shuttle']],
+  ['nightBus','transit','金曜の深夜バス、終点を変更','きのう 20:15','商店街裏の停留所が新しい終点。駅を出る時刻はこれまでと同じ。'],
+  ['plasticDay','city','容器包装の回収日、一部地区で変更','きょう 08:05','南区の一部では来月から木曜回収に変わる。紙資源の曜日は変わらない。'],
+  ['libraryEvent','city','図書館の読み聞かせ会、交流館で開催','きのう 13:10','会場は市民交流館の和室。図書館の休館中サービスは別のお知らせに掲載。',['libraryGuide']],
+  ['waterBlock','city','青葉町1丁目の断水は午前中','きょう 13:05','1丁目は10:00から正午まで。2丁目の時刻は地区別の最新版を確認。',['waterGuide']],
+  ['clinicDesk','city','休日診療所、受付入口を工事のため変更','2日前','西側通用口で受付を行う。駐輪場は工事期間中も使える。'],
+  ['streetLights','city','潮見通りの街灯を順次交換','4日前','日中に作業車両が停まる。交換後は従来より色温度を下げる予定。'],
+  ['publicPool','city','市民プールの更衣室、改修を完了','きのう 10:40','ロッカーは硬貨式からリストバンド式に替わった。一般利用は通常どおり。'],
+  ['lostUmbrella','city','駅前広場の忘れ物、一時保管先を変更','3日前','傘や帽子は駅の窓口ではなく街の案内所で保管する。'],
+  ['morningBroadcast','city','防災スピーカー、試験放送の日程発表','きょう 12:15','来週水曜の午後に放送を試す。受信が難しかった地区では追加点検を行う。'],
+  ['waterMeter','city','水道メーターの検針に市の職員が訪問','きのう 09:30','立ち会いは不要。メーターボックス付近に物を置かないよう市が案内している。'],
+  ['readingRoom','city','港図書館の閲覧席、休館前は予約不要','4日前','休館前の日曜までは通常運用。休館開始後の予約本受け取りは別の案内へ。',['libraryGuide']],
+  ['parkTrees','city','港公園の遊歩道を一部閉鎖、剪定のため','きょう 10:55','北端の遊歩道は午後から閉鎖する。噴水前の広場は利用可能。'],
+  ['communityHall','city','市民交流館の会議室、予約方法を変更','2日前','翌月分の予約受付は毎月最初の開館日から。利用時間の区分も改定する。'],
+  ['dentCare','city','保健センターで歯の相談会','5日前','無料の個別相談を午前中に実施する。事前予約は電話で受け付ける。']
+];
+for (const [id, category, title, date, text, related = []] of extraArticles) {
+  articles[id] = {category, title, date, paragraphs:[text], related};
+}
+
+// 依頼を増やすときは setup（前置き）、ask（質問）、fields（回答欄）、hint（ヒント）を指定します。
+// 時刻欄は [ラベル, '時刻']。選択欄は [ラベル, '選択', 選択肢の配列]。
+const missions = [
+  {article:'gates', setup:'明日、みなと灯り祭行くやん？', ask:'明日の南側ゲートの開場時刻と、再入場できるゲートを調べてくれへん？', fields:[['南側ゲートの開場時刻','時刻'],['再入場できるゲート','選択',['北側ゲート','南側ゲート','両方']]], hint:'最初の開催概要から変わったらしい。入場案内の当日版、どっかにないかな。'},
+  {article:'timetable', setup:'明日の灯り祭、臨時バスで行こか。', ask:'港中央駅から会場へ行く初便の時刻と、駅前の乗り場を調べてくれへん？', fields:[['会場行きの初便','時刻'],['駅前の乗り場','選択',['1番','2番','3番']]], hint:'駅から会場へ行く方の時刻表を見てみて。'},
+  {article:'marketGuide', setup:'日曜、港町朝市に行くって話してたやん？', ask:'雨で会場が変わったらしい。一般のお客さんが入る入口と、何時から入れるか見てくれへん？', fields:[['一般来場者の入口','選択',['東口','西口','正面口']],['一般入場の開始時刻','時刻']], hint:'雨天版の案内に、出店者と一般来場者が別々に載ってるはず。'},
+  {article:'ferryNotice', setup:'土曜の朝、南島までフェリーで行きたいねん。', ask:'点検で運休する便があるらしい。土曜、潮見港から南島へ行ける一番早い便は何時？', fields:[['潮見港発の最初の便','時刻']], hint:'土曜の臨時時刻表で、潮見港を出る側を見てみて。'},
+  {article:'libraryGuide', setup:'港図書館に本とDVD返そうと思ってたら、休館らしいねん。', ask:'休館中、本とDVDはそれぞれどこに返したらええか調べてくれへん？', fields:[['本の返却先','選択',['返却ポスト','駅前分室','市民交流館']],['DVDの返却先','選択',['返却ポスト','駅前分室','市民交流館']]], hint:'市のお知らせに、資料の種類ごとに書かれてると思う。'},
+  {article:'waterGuide', setup:'来週火曜、青葉町で水道工事があるらしい。', ask:'2丁目の断水が始まる時刻と、給水車が来る場所を見てくれへん？', fields:[['2丁目の断水開始','時刻'],['給水車の場所','選択',['青葉小学校','市民交流館','港公園']]], hint:'工事全体の時間と、2丁目の断水時間は別みたい。'}
+];
+// 記事キーごとの回答候補。各行は一組で、fields の順番と記事中の {0}、{1} に対応します。
+const answerScenarios = {
+  gates:[['16:30','北側ゲート'],['16:00','南側ゲート'],['17:00','北側ゲート'],['17:15','南側ゲート']],
+  timetable:[['14:40','3番'],['14:55','1番'],['15:10','3番'],['15:30','1番']],
+  marketGuide:[['東口','09:30'],['西口','10:00'],['正面口','10:30'],['東口','09:45']],
+  ferryNotice:[['09:20'],['09:40'],['10:05'],['10:30']],
+  libraryGuide:[['返却ポスト','駅前分室'],['駅前分室','市民交流館'],['市民交流館','駅前分室'],['返却ポスト','市民交流館']],
+  waterGuide:[['13:30','青葉小学校'],['13:00','市民交流館'],['12:45','港公園'],['14:00','青葉小学校']]
+};
+let roundAnswers = {};
+function randomizeAnswers() {
+  const previous = roundAnswers;
+  roundAnswers = Object.fromEntries(Object.entries(answerScenarios).map(([id, scenarios]) => {
+    const candidates = scenarios.filter(row => row !== previous[id]);
+    return [id, candidates[randomInt(0, candidates.length - 1)]];
+  }));
+}
+// 広告IDごとに [広告主, クリック後の説明, 広告ボタンの文言] を定義します。
+// 画面に出る見出しは spawnCard()、抽選対象は timedAdKinds を編集してください。
+const ads = {
+  gate:['みなとゲート案内 Pro','会場のゲート名を一括管理。全国のイベント主催者さま向け。','南側ゲートの開場時刻はこちら →'],
+  map:['みなと地図プラス','海沿いの会場をまとめて検索。海に落ちる手前でナビが終わります。','会場マップを開く →'],
+  lottery:['港町くじ','今なら、くじを引く権利が当たるくじに応募できます。','今すぐ結果を見る'],
+  subscribe:['夕刊みなとプラス','毎朝、夕刊の見出しを127通お届けします。','閉じる ×'],
+  push:['ご近所速報','祭りが終わったあとの情報も、深夜までお届けします。','通知を許可する'],
+  sale:['超特価ランタン','光るランタンを買うと、光るランタン用の光らない箱をプレゼント。','割引を受け取る'],
+  tiny:['港町プレゼント事務局','応募だけで「応募完了」と書かれた壁紙をプレゼント。','賞品を受け取る'],
+  gross:['おなら研究所','音だけで食べたものが分かるという、根拠のない教材です。','ブボッ！ 秘密を見る'],
+  video:['みなと動画放送','おすすめ動画を閉じると、おすすめ動画のおすすめが始まります。','▶ 続きを再生'],
+  cookies:['広告のためのクッキー店','サイトで読んだ記事に合わせて、いらない広告をさらに表示します。','すべて許可'],
+  scrollOffer:['みなと読者クラブ','続きが気になったころに現れる読者クラブです。','続けて読む'],
+  support:['港町なんでも窓口','架空の自動応答サービスです。最初の質問に答えると次の質問が出ます。','相談を始める'],
+  survey:['みなと読者アンケート','押した回答に関係なく、広告だけが表示されるアンケートです。','回答する'],
+  linkToast:['ページめくる保険相談','リンクを押した直後に出てきた、架空の保険相談サービスです。','その保険、見直してみませんか？'],
+  install:['夕刊みなとアプリ','記事を読もうとするたびに宣伝される架空のアプリです。','アプリを入手'],
+  next:['もっと読む Plus','「次のページ」で開く広告サービス。ページ送り機能は付いていません。','次のページへ →'],
+  insurance:['家族のまるごと保険','もしものときの備えを考える、架空の保険比較サービスです。','保険料、払いすぎていませんか？'],
+  career:['転職のとなり','求人票を開いたらまず面談の予約を勧めてくる、架空の転職サービスです。','あなたの想定年収をチェック'],
+  dumplings:['冷凍餃子の千皿屋','冷凍庫が餃子でいっぱいになる大袋。タレは別売りです。','焼くだけで今日の夕食が決まる'],
+  mattress:['朝まで寝具店','もう少し寝たい朝に便利なマットレス。寝坊の補償は付きません。','新生活マットレス特集'],
+  movingHome:['手早い引越センター','段ボールだけが先に届く、架空の引越見積もりサービスです。','引越料金を一括で比較'],
+  toothbrush:['ソニック歯ブラシ研究所','歯みがきの時間をスマホで確認できる、架空の電動歯ブラシです。','電動歯ブラシ 期間限定セール'],
+  virus:['パソコン元気堂','「お使いのPC」はゲーム内の画面です。こちらは偽警告から誘導された架空の広告です。','今すぐ修復']
+};
+// 画像付き商品を増やすときは、ads と adImages に同じIDを追加し、画像を ads/ に置きます。
+const adImages = {
+  insurance:'insurance.webp',
+  career:'career.webp',
+  dumplings:'dumplings.webp',
+  mattress:'mattress.webp',
+  movingHome:'moving-home.webp',
+  toothbrush:'toothbrush.webp'
+};
+const photoAdIds = Object.keys(adImages);
+const timedAdKinds = ['modal','slide','moving','virus','shift','sticky','tiny','gross','video','cookies','support','survey','install','next','photo'];
+// trail はニュース内の履歴、scheduled は再挑戦時に一括で取り消すタイマーです。
+let feed = [];
+let listProgress = 0;
+let listHighWater = 0;
+let scrollAdReadyAt = 0;
+let lockedScrollTop = null;
+let intro;
+let mission;
+let missionDeck = [];
+const trail = [];
+const scheduled = new Set();
+let deck = [];
+let introDone = false;
+let started = null;
+let finished = false;
+let hits = 0;
+let wrongReplies = 0;
+let burst = null;
+
+function element(tag, className, text) {
+  const item = document.createElement(tag);
+  item.className = className;
+  if (text !== undefined) item.textContent = text;
+  return item;
+}
+function button(className, text) {
+  const item = element('button', className, text);
+  item.type = 'button';
+  return item;
+}
+// ゲーム内の setTimeout はここを通し、クリアや再挑戦の直後に広告が残らないようにします。
+function later(callback, delay) {
+  const id = setTimeout(() => {
+    scheduled.delete(id);
+    callback();
+  }, delay);
+  scheduled.add(id);
+  return id;
+}
+function clearTimers() {
+  for (const id of scheduled) clearTimeout(id);
+  scheduled.clear();
+}
+function randomInt(min, max) {
+  return min + Math.floor(Math.random() * (max - min + 1));
+}
+function shuffle(values) {
+  const items = [...values];
+  for (let index = items.length - 1; index > 0; index--) {
+    const other = randomInt(0, index);
+    [items[index], items[other]] = [items[other], items[index]];
+  }
+  return items;
+}
+// チャットの描画と、リンクを押してからゲームを開始する処理です。
+function addMessage(who, text) {
+  const bubble = element('div', who === 'me' ? 'bubble me' : 'bubble');
+  if (who === 'link') {
+    const link = element('a', '', text);
+    link.href = '#home';
+    link.addEventListener('click', event => {
+      event.preventDefault();
+      if (!introDone) finishIntro();
+      if (started === null) start();
+      else revealPc();
+      spawnLinkToast();
+    });
+    bubble.append(link, element('small', '', 'yukan-minato.test/local'));
+  } else {
+    bubble.textContent = text;
+  }
+  messages.append(bubble);
+  messages.scrollTop = messages.scrollHeight;
+}
+function finishIntro() {
+  if (introDone) return;
+  clearTimers();
+  introDone = true;
+  addMessage(...intro.at(-1));
+}
+function playIntro() {
+  intro.forEach((entry, index) => {
+    later(() => {
+      if (index === intro.length - 1) finishIntro();
+      else addMessage(...entry);
+    }, 240 + index * 770);
+  });
+}
+function readTime() {
+  const seconds = Math.max(0, Math.floor((performance.now() - started) / 1000));
+  return [Math.floor(seconds / 60), seconds % 60].map(n => String(n).padStart(2, '0')).join(':');
+}
+// 選択中のアプリを CSS に伝えます。画面を作り直さないため、閲覧位置はそのままです。
+function switchApp(app) {
+  get('stage').dataset.app = app;
+  get('app-chat').setAttribute('aria-pressed', String(app === 'chat'));
+  get('app-news').setAttribute('aria-pressed', String(app === 'news'));
+  if (matchMedia('(max-width: 690px)').matches) window.scrollTo(0, 0);
+}
+function revealPc() {
+  switchApp('news');
+  const target = layer.querySelector('.modal-ad .ad-close') ?? page.querySelector('h1');
+  target.focus({preventScroll:true});
+}
+function start() {
+  started = performance.now();
+  get('stage').classList.add('playing');
+  get('stats').hidden = false;
+  get('reply').hidden = false;
+  get('app-switch').hidden = false;
+  pc.hidden = false;
+  trail.push({id:'home', scroll:0});
+  render();
+  revealPc();
+  if (Math.random() < .8 * settings.adFrequency) spawnSticky();
+  scheduleAd(randomInt(...settings.firstAdDelay));
+}
+// 新しいタブはブラウザー標準のリンクで開きます。広告IDと同名のHTMLを用意してください。
+function adLink(className, id, text) {
+  const link = element('a', className, text);
+  link.dataset.ad = id;
+  link.href = 'ad-pages/' + id + '.html';
+  link.target = '_blank';
+  link.rel = 'noopener noreferrer';
+  return link;
+}
+function siteLink(id, label, className = 'site-link') {
+  const link = element('a', className, label);
+  link.href = '#' + id;
+  link.dataset.page = id;
+  return link;
+}
+function newsRow(id) {
+  const article = articles[id];
+  const row = siteLink(id, undefined, 'row');
+  row.append(element('small', '', article.date + ' ・ ' + categories[article.category]), element('strong', '', article.title + ' →'));
+  return row;
+}
+function makeSlot() {
+  const slot = element('div', 'slot inline');
+  slot.dataset.slot = 'inline';
+  return slot;
+}
+// トップには全記事、カテゴリには該当記事を表示します。順番は1プレイの間固定です。
+function buildPage(id) {
+  const article = articles[id];
+  const category = article?.category ?? (categories[id] ? id : null);
+  const title = article?.title ?? categories[id] ?? 'ニュース一覧';
+  const crumb = element('nav', 'crumb');
+  crumb.setAttribute('aria-label','パンくずリスト');
+  if (id === 'home') {
+    crumb.append(element('span', '', 'トップ'));
+  } else {
+    crumb.append(siteLink('home', 'トップ'), ' › ');
+    if (article) crumb.append(siteLink(category, categories[category]), ' › ');
+    crumb.append(element('span', '', article ? '記事' : title));
+  }
+  const heading = element('h1', '', title);
+  heading.tabIndex = -1;
+  page.replaceChildren(crumb, heading);
+  const slot = makeSlot();
+  if (article) {
+    page.append(element('p', 'meta', article.date + ' ／ 夕刊みなと編集部'));
+    const story = element('section', 'story');
+    const paragraphs = article.paragraphs.map(text => element('p', '', text.replace(/\{(\d+)\}/g, (_, index) => roundAnswers[id][index])));
+    story.append(paragraphs[0], slot, ...paragraphs.slice(1));
+    page.append(story);
+    if (article.related.length) page.append(element('h2', 'related-heading', '関連記事'), ...article.related.map(newsRow));
+    return;
+  }
+  const ids = category ? feed.filter(key => articles[key].category === category) : feed;
+  const firstRows = ids.slice(0, 2).map(newsRow);
+  page.append(...firstRows, slot, ...ids.slice(2).map(newsRow));
+}
+function render(restore = false) {
+  const current = trail.at(-1);
+  const id = current.id;
+  buildPage(id);
+  get('address').textContent = 'yukan-minato.test' + (id === 'home' ? '/' : categories[id] ? '/section/' + id : '/news/' + id);
+  get('back').disabled = trail.length === 1;
+  const slot = page.querySelector('[data-slot]');
+  if (!finished && Math.random() < .87 * settings.adFrequency) {
+    // 記事に関係のない広告と、記事に似せた広告の両方を混ぜます。
+    const candidates = Math.random() < 0.65 ? photoAdIds : ['gate','map','lottery','gross'];
+    const adId = candidates[randomInt(0, candidates.length - 1)];
+    const item = adLink('native', adId);
+    item.append(element('span', 'ad-label', '広告'));
+    if (adImages[adId]) item.append(makeAdPhoto(adId));
+    item.append(element('strong', '', ads[adId][2]), element('small', '', ads[adId][0]));
+    slot.append(item);
+  }
+  page.querySelector('h1').focus({preventScroll:true});
+  scroll.scrollTop = restore ? current.scroll : 0;
+  listHighWater = scroll.scrollTop;
+  listProgress = 0;
+}
+function navigate(id) {
+  if (trail.at(-1).id === id) {
+    scroll.scrollTop = 0;
+    listHighWater = listProgress = 0;
+    return;
+  }
+  trail.at(-1).scroll = scroll.scrollTop;
+  trail.push({id, scroll:0});
+  render();
+}
+function back() {
+  if (trail.length < 2) return;
+  trail.pop();
+  render(true);
+}
+function closeButton(label, remove, escapes = 0) {
+  const item = button('ad-close', '×');
+  item.setAttribute('aria-label', label);
+  item.addEventListener('click', event => {
+    if (event.detail > 0 && escapes > 0) {
+      dodgeCloseButton(item, escapes--);
+      return;
+    }
+    remove();
+  });
+  return item;
+}
+// 「閉じる」が押されると、カードの内側で二回転しながら反対の角へ飛びます。
+function dodgeCloseButton(item, escapes) {
+  const card = item.closest('.ad-card');
+  const fromX = item.offsetLeft;
+  const fromY = item.offsetTop;
+  const maxX = card.clientWidth - item.offsetWidth - 12;
+  const maxY = card.clientHeight - item.offsetHeight - 12;
+  const toX = escapes === 2 ? 12 : maxX;
+  const toY = maxY;
+  item.style.right = 'auto';
+  item.style.left = toX + 'px';
+  item.style.top = toY + 'px';
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches || !item.animate) return;
+  const deltaX = fromX - toX;
+  const deltaY = fromY - toY;
+  item.getAnimations().forEach(animation => animation.cancel());
+  item.animate([
+    {transform:'translate(' + deltaX + 'px,' + deltaY + 'px) rotate(0)'},
+    {transform:'translate(' + deltaX * .45 + 'px,' + -Math.min(48, toY) + 'px) rotate(235deg) scale(.65)'},
+    {transform:'translate(0,0) rotate(720deg) scale(1)'}
+  ], {duration:520, easing:'cubic-bezier(.2,.7,.25,1)'});
+}
+function adHeader(title, close) {
+  const header = element('div', 'ad-head');
+  header.append(element('span', '', title), close);
+  return header;
+}
+function adAction(id, text = ads[id][2]) {
+  return adLink('ad-action', id, text);
+}
+function makeAdPhoto(id) {
+  const image = element('img', 'ad-photo');
+  image.src = 'ads/' + adImages[id];
+  image.alt = '';
+  return image;
+}
+// 偽ウイルス警告は、表示待ちのウィンドウも含めて1種類分の枠を使います。
+function hasPopupRoom() {
+  const otherPopups = layer.children.length - layer.querySelectorAll('.virus').length;
+  return otherPopups + Number(Boolean(burst)) < settings.maxPopupKinds;
+}
+function spawnPhotoAd() {
+  if (!hasPopupRoom()) return;
+  if (layer.querySelector('.photo-ad')) return;
+  const id = photoAdIds[randomInt(0, photoAdIds.length - 1)];
+  const card = element('div', 'ad-card photo-ad');
+  card.dataset.transient = '';
+  const creative = adLink('photo-button', id);
+  creative.append(makeAdPhoto(id), element('strong', '', ads[id][2]));
+  card.append(adHeader('広告 ・ ' + ads[id][0], closeButton('画像広告を閉じる', () => card.remove())), creative);
+  layer.append(card);
+}
+// 記事やカテゴリのリンクを押した直後だけ出る広告。閉じるまで画面下に残ります。
+function spawnLinkToast() {
+  if (!hasPopupRoom() || finished || layer.querySelector('.link-toast') || Math.random() >= settings.adFrequency) return;
+  const card = element('div', 'ad-card link-toast');
+  const close = closeButton('トースト広告を閉じる', () => card.remove());
+  card.append(adHeader('スポンサーからのお知らせ', close), adLink('', 'linkToast', ads.linkToast[2]));
+  layer.append(card);
+}
+function spawnSticky() {
+  if (!hasPopupRoom() || layer.querySelector('.sticky-ad')) return;
+  const item = element('div', 'ad-card sticky-ad');
+  item.append(adAction('map', '会場マップ　広告'), closeButton('追従バナーを閉じる', () => item.remove()));
+  layer.append(item);
+}
+// モーダル中はスクロール位置を保持し、慣性スクロールやキー操作でも裏が動かないようにします。
+function lockScroll() {
+  lockedScrollTop ??= scroll.scrollTop;
+  scroll.classList.add('is-locked');
+  scroll.inert = true;
+}
+function unlockScroll() {
+  if (lockedScrollTop !== null) {
+    scroll.scrollTop = lockedScrollTop;
+    scrollAdReadyAt = performance.now() + settings.scrollAdCooldown;
+    lockedScrollTop = null;
+  }
+  scroll.classList.remove('is-locked');
+  scroll.inert = false;
+}
+function tryScrollAd() {
+  const position = scroll.scrollTop;
+  if (lockedScrollTop !== null) {
+    if (position !== lockedScrollTop) scroll.scrollTop = lockedScrollTop;
+    return;
+  }
+  const id = trail.at(-1)?.id;
+  if (!id || finished || Object.hasOwn(articles, id) || burst) return;
+  // 同じ箇所を上下に揺らしても再抽選しません。新たに下へ読んだ距離だけを数えます。
+  if (position <= listHighWater) return;
+  const distance = position - listHighWater;
+  listHighWater = position;
+  if (performance.now() < scrollAdReadyAt) return;
+  listProgress += distance;
+  if (listProgress < settings.scrollAdDistance) return;
+  listProgress %= settings.scrollAdDistance;
+  if (Math.random() < settings.scrollAdChance * settings.adFrequency) spawnCard('scrollOffer');
+}
+// 一度出した広告は閉じられるまで残し、同じ形式の広告は重ねて出しません。
+function spawnCard(kind) {
+  if (!hasPopupRoom() || layer.querySelector('[data-kind="' + kind + '"]')) return;
+  const isModal = kind === 'modal' || kind === 'scrollOffer';
+  const config = {
+    scrollOffer:['scrollOffer','スポンサーからのお知らせ','スクロールの途中ですが','続きをご覧になる前に、夕刊みなと読者クラブをご案内します。'],
+    support:['support','サポート窓口　● オンライン','なにかお探しですか？','アシスタントから新着メッセージがあります。'],
+    survey:['survey','30秒で終わる読者アンケート','ネットで買い物をする前に、口コミを読みますか？','どちらかを選んで先に進んでください。'],
+    install:['install','夕刊みなと 公式アプリ','アプリで快適に読む','ブラウザーで読むたび、この案内が表示されます。'],
+    modal:['subscribe','スポンサーからのお知らせ','記事の続きを見る前に','夕刊みなとプラスの無料体験受付中。'],
+    slide:['push','yukan-minato.test','通知を表示しますか？','イベントの更新を今すぐ受け取れます。'],
+    moving:['sale','広告 ／ 本日限り','＼ 港が見えるほど光る ／','超特価ランタン 99% OFF'],
+    tiny:['tiny','広告 ／ 当選通知','おめでとうございます！','このページを見た方だけに特別な賞品。'],
+    gross:['gross','広告 ／ おなら研究所','屁の音がデカすぎて草','便座にヒビが入るほどの爆音。その理由とは？'],
+    video:['video','広告 ／ 自動再生','▶ おすすめ動画を再生中','数秒後にスキップできます。'],
+    cookies:['cookies','プライバシー設定','クッキーを許可しますか？','あなたにぴったりの広告を決めるために使います。']
+  }[kind];
+  const [id, label, title, copy] = config;
+  const wrapper = isModal ? element('div', kind === 'modal' ? 'modal-ad runaway-modal' : 'modal-ad') : null;
+  const card = element('div', 'ad-card ' + (isModal ? '' : kind + '-ad'));
+  const top = wrapper ?? card;
+  top.dataset.transient = '';
+  top.dataset.kind = kind;
+  const close = closeButton('広告を閉じる', () => {
+    const focused = top.contains(document.activeElement);
+    top.remove();
+    if (isModal) unlockScroll();
+    if (focused) page.querySelector('h1').focus({preventScroll:true});
+  }, kind === 'modal' ? 2 : 0);
+  if (kind === 'install') close.textContent = 'あとで';
+  if (kind === 'cookies') close.textContent = '興味ないので断る';
+  if (kind === 'video') {
+    close.disabled = true;
+    close.textContent = '3秒';
+    later(() => { close.textContent = '2秒'; }, 1000);
+    later(() => { close.textContent = '1秒'; }, 2000);
+    later(() => { close.textContent = 'スキップ'; close.disabled = false; }, 3000);
+  }
+  card.append(adHeader(label, close), element('strong', '', title), element('p', '', copy));
+  if (kind === 'survey') card.append(adAction(id, '読む'), adAction(id, '読まない'));
+  else card.append(adAction(id));
+  if (wrapper) wrapper.append(card);
+  layer.append(top);
+  if (isModal) {
+    lockScroll();
+    close.focus({preventScroll:true});
+  }
+}
+function stopBurst() {
+  if (burst) {
+    for (const id of burst.timers) {
+      clearTimeout(id);
+      scheduled.delete(id);
+    }
+    burst = null;
+  }
+  layer.querySelectorAll('.virus').forEach(card => card.remove());
+}
+// 連続ポップアップ。枚数、重なり方、出現間隔はここで調整できます。
+function spawnBurst() {
+  if (!hasPopupRoom() || burst) return;
+  const batch = {timers:[], total:randomInt(6, 9), spawned:0};
+  burst = batch;
+  const titles = ['SYSTEM ALERT','保護センター','UPDATE.EXE','PC CHECK','警告 0x0042'];
+  for (let index = 0; index < batch.total; index++) {
+    const id = later(() => {
+      if (burst !== batch) return;
+      batch.spawned++;
+      const card = element('div', 'ad-card virus');
+      card.dataset.transient = '';
+      const maxX = Math.max(0, layer.clientWidth - 236);
+      const maxY = Math.max(0, layer.clientHeight - 126);
+      card.style.left = Math.min(maxX, 4 + index * Math.round(maxX / batch.total) + randomInt(0, 8)) + 'px';
+      card.style.top = Math.min(maxY, 6 + index * Math.min(37, Math.floor(maxY / batch.total)) + randomInt(0, 6)) + 'px';
+      const close = closeButton('警告ウィンドウを閉じる', () => {
+        card.remove();
+        const remaining = layer.querySelectorAll('.virus');
+        if (remaining.length) remaining[remaining.length - 1].querySelector('.ad-close').focus({preventScroll:true});
+        else {
+          if (batch.spawned === batch.total) stopBurst();
+          page.querySelector('h1').focus({preventScroll:true});
+        }
+      });
+      const body = element('div', 'body');
+      body.append(element('strong', '', '⚠ 異常を ' + randomInt(12, 99) + ' 件検出'), adAction('virus'));
+      card.append(adHeader(titles[index % titles.length], close), body);
+      layer.append(card);
+    }, index * randomInt(100, 190));
+    batch.timers.push(id);
+  }
+}
+function shiftArticle(kind) {
+  const slot = page.querySelector('[data-slot="inline"]');
+  if (slot.querySelector('[data-delayed]')) return;
+  const id = kind === 'next' ? 'next' : 'gate';
+  const item = adLink(kind === 'next' ? 'native next-ad' : 'native', id);
+  item.dataset.delayed = '';
+  item.append(element('span', 'ad-label', '広告'), element('strong', '', ads[id][2]));
+  slot.prepend(item);
+}
+// タイマー広告は全種をランダムに並べて1回ずつ消化し、その後また並べ直します。
+function scheduleAd(delay) {
+  later(() => {
+    if (burst || layer.querySelector('.modal-ad')) {
+      scheduleAd(1200);
+      return;
+    }
+    if (Math.random() >= settings.adFrequency) {
+      scheduleAd(randomInt(...settings.timedAdDelay));
+      return;
+    }
+    if (!deck.length) deck = shuffle(timedAdKinds);
+    const kind = deck.pop();
+    if (kind === 'virus') spawnBurst();
+    else if (kind === 'shift' || kind === 'next') shiftArticle(kind);
+    else if (kind === 'sticky') spawnSticky();
+    else if (kind === 'photo') spawnPhotoAd();
+    else spawnCard(kind);
+    scheduleAd(randomInt(...settings.timedAdDelay));
+  }, delay);
+}
+// 広告のリンクを踏んだ時だけ失点します。×で閉じただけではカウントしません。
+function countAdClick() {
+  if (finished) return;
+  hits++;
+  get('hits').textContent = hits;
+}
+function finish() {
+  finished = true;
+  clearTimers();
+  stopBurst();
+  layer.replaceChildren();
+  unlockScroll();
+  page.querySelectorAll('[data-slot]').forEach(slot => slot.replaceChildren());
+  get('reply').hidden = true;
+  get('result').hidden = false;
+  const time = readTime();
+  get('time').textContent = time;
+  get('score').textContent = 'クリア！　' + time + ' ／ 広告クリック ' + hits + '回' + (hits === 0 ? ' ／ ノーミス' : '');
+  get('retry').focus({preventScroll:true});
+}
+// 1プレイの状態を初期化します。記事と依頼は別々に抽選します。
+function reset() {
+  clearTimers();
+  stopBurst();
+  layer.replaceChildren();
+  unlockScroll();
+  page.replaceChildren();
+  messages.replaceChildren();
+  trail.length = 0;
+  feed = shuffle(Object.keys(articles));
+  randomizeAnswers();
+  listHighWater = listProgress = scrollAdReadyAt = 0;
+  deck = [];
+  introDone = false;
+  started = null;
+  finished = false;
+  hits = wrongReplies = 0;
+  get('hits').textContent = '0';
+  get('time').textContent = '00:00';
+  get('stage').classList.remove('playing');
+  get('stats').hidden = pc.hidden = get('reply').hidden = get('result').hidden = true;
+  get('app-switch').hidden = true;
+  switchApp('chat');
+  if (!missionDeck.length) {
+    const previous = mission;
+    missionDeck = shuffle(missions);
+    if (missionDeck.at(-1) === previous) missionDeck.unshift(missionDeck.pop());
+  }
+  mission = missionDeck.pop();
+  intro = [['friend',mission.setup],['me','うん、どうしたん？'],['friend',mission.ask],['link','夕刊みなと｜ニュース一覧'],['me','見てみる。ちょっと待ってね。']];
+  buildFields();
+  window.scrollTo(0, 0);
+  playIntro();
+}
+function buildFields() {
+  get('fields').replaceChildren(...mission.fields.map(([label, type, options], index) => {
+    const field = element('div','field');
+    const title = element('label','',label);
+    const control = element(type === '時刻' ? 'input' : 'select', '');
+    control.id = title.htmlFor = 'answer-' + index;
+    control.required = true;
+    if (type === '時刻') {
+      control.placeholder = '例 11:00';
+      control.autocomplete = 'off';
+      control.maxLength = 25;
+    } else {
+      const placeholder = element('option', '', '選択してください');
+      placeholder.value = '';
+      control.append(placeholder, ...options.map(option => element('option', '', option)));
+    }
+    field.append(title, control);
+    return field;
+  }));
+}
+function normalizeTime(raw) {
+  const value = raw.normalize('NFKC').replace(/\s/g, '');
+  const match = /^(午前|午後)?(\d{1,2})(?:[:時](\d{1,2})分?|時)(AM|PM)?(?:から)?[。！!]?$/i.exec(value);
+  if (!match) return '';
+  const [, prefix, hours, minutes = '0', suffix] = match;
+  if (prefix && suffix) return '';
+  const period = prefix || suffix?.toUpperCase();
+  let hour = Number(hours);
+  const minute = Number(minutes);
+  if (minute > 59 || (period ? hour < 1 || hour > 12 : hour > 23)) return '';
+  if (period) hour = hour % 12 + (period === '午後' || period === 'PM' ? 12 : 0);
+  return [hour, minute].map(part => String(part).padStart(2, '0')).join(':');
+}
+// 操作イベント。スクロール広告は記事詳細ではなく、トップとカテゴリ一覧だけで抽選します。
+scroll.addEventListener('scroll', tryScrollAd, {passive:true});
+get('sections').append(siteLink('home','トップ'), ...Object.entries(categories).map(([id, label]) => siteLink(id,label)));
+pc.addEventListener('click', event => {
+  const item = event.target.closest('[data-page], [data-ad]');
+  if (!item) return;
+  if (item.dataset.page) {
+    event.preventDefault();
+    navigate(item.dataset.page);
+    spawnLinkToast();
+  }
+  if (item.dataset.ad) countAdClick();
+});
+pc.addEventListener('auxclick', event => {
+  if (event.button === 1 && event.target.closest('[data-ad]')) countAdClick();
+});
+pc.addEventListener('keydown', event => {
+  if (event.key === 'Escape') layer.querySelector('.modal-ad .ad-close')?.click();
+});
+get('back').addEventListener('click', () => {
+  if (lockedScrollTop !== null) layer.querySelector('.modal-ad .ad-close')?.click();
+  else back();
+});
+get('app-chat').addEventListener('click', () => switchApp('chat'));
+get('app-news').addEventListener('click', revealPc);
+// 回答欄の値を正答と照合します。時刻は全角や「午後4時30分」も正規化します。
+get('reply').addEventListener('submit', event => {
+  event.preventDefault();
+  if (started === null || finished) return;
+  const replies = mission.fields.map((_, index) => get('answer-' + index).value.trim());
+  if (replies.some(value => !value)) return;
+  addMessage('me', mission.fields.map(([label], index) => label + '　' + replies[index]).join(' ／ '));
+  const answers = roundAnswers[mission.article];
+  const correct = mission.fields.every(([, type], index) => {
+    const reply = type === '時刻' ? normalizeTime(replies[index]) : replies[index];
+    return reply === answers[index];
+  });
+  if (correct) {
+    addMessage('friend', '助かった！ 調べてくれてありがとう。');
+    finish();
+  } else {
+    const line = wrongReplies++ === 0 ? 'どこか違うみたい。記事の条件と見比べてみてくれへん？' : mission.hint;
+    addMessage('friend', line);
+  }
+});
+get('retry').addEventListener('click', reset);
+setInterval(() => {
+  if (started !== null && !finished) get('time').textContent = readTime();
+}, 250);
+reset();
+</script>
+</body>
+</html>
