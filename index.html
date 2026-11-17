@@ -42,7 +42,7 @@ button:disabled{cursor:default;opacity:.56}
 @keyframes arrive{from{opacity:0;transform:translateX(16px)}}
 .chrome{display:flex;gap:6px;align-items:center;background:#dbe2e5;color:#19262d;border-radius:7px 7px 0 0;padding:6px}
 .chrome button{border:0;background:#eef2f3;border-radius:4px;min-width:35px;min-height:32px}
-.address{flex:1;min-width:0;background:white;border-radius:4px;padding:5px 8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font:.74rem/1.7 ui-monospace,monospace}
+.location-bar{flex:1;min-width:0;background:white;border-radius:4px;padding:5px 8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font:.74rem/1.7 ui-monospace,monospace}
 .screen{position:relative;isolation:isolate;background:var(--paper);color:var(--ink);height:clamp(370px,74vh,680px);overflow:hidden}
 .scroll{height:100%;overflow:auto;overscroll-behavior:contain;scrollbar-gutter:stable;padding-bottom:70px}
 .mast{padding:12px 17px;background:#203d4e;color:#fff;display:flex;align-items:center;justify-content:space-between;gap:10px}
@@ -62,34 +62,34 @@ h2{font-size:1.04rem;margin-bottom:8px}
 .native{width:100%;display:block;text-align:left;border:1px solid #d6d3c8;border-radius:4px;background:#fffdf7;color:#213c4a;padding:9px}
 .native strong,.native small{display:block}
 .native strong{text-decoration:underline;text-underline-offset:3px}
-.native small,.native .ad-label{color:#526369}
-.ad-label{font-size:.66rem;border:1px solid currentColor;border-radius:3px;padding:0 4px}
+.native small,.native .promo-label{color:#526369}
+.promo-label{font-size:.66rem;border:1px solid currentColor;border-radius:3px;padding:0 4px}
 .inline{margin:10px 0}
 /* 広告はニュースの上に重ね、何もない部分では記事を操作できます。 */
 .layer{position:absolute;inset:0;pointer-events:none;z-index:3;overflow:hidden}
 .layer button,.layer a{pointer-events:auto}
-.ad-close{background:#fff;color:#1a2430;border:1px solid #9c9da8;min-width:32px;min-height:32px;line-height:1;border-radius:4px;font-weight:900}
-.ad-action{border:1px solid #0004;background:#eef3f6;color:#18384c;border-radius:5px;padding:6px 10px;font-weight:900}
-.ad-card{pointer-events:auto;position:absolute;padding:11px;border-radius:8px;box-shadow:0 8px 22px #0006;max-width:calc(100% - 16px)}
-.ad-card strong{display:block;font-size:1.05rem}
-.ad-card p{margin:4px 0 8px;font-size:.82rem}
-.ad-head{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:5px}
-.sticky-ad{left:7px;bottom:7px;display:flex;padding:0;background:#e5edf2;color:#223f52}
-.sticky-ad .ad-action{background:none;border:0}
-.modal-ad{pointer-events:auto;position:absolute;inset:0;display:grid;place-items:center;background:#142130ba;padding:14px}
-.modal-ad .ad-card{position:relative;width:min(100%,375px);background:#5e1c6c;color:white;padding:15px}
-.modal-ad .ad-card strong{font-size:1.42rem}
-.slide-ad{right:7px;bottom:53px;background:#fff;color:#263047;border:1px solid #a5adba;width:285px;animation:slide .45s ease-out}
+.promo-close{background:#fff;color:#1a2430;border:1px solid #9c9da8;min-width:32px;min-height:32px;line-height:1;border-radius:4px;font-weight:900}
+.promo-action{border:1px solid #0004;background:#eef3f6;color:#18384c;border-radius:5px;padding:6px 10px;font-weight:900}
+.promo-card{pointer-events:auto;position:absolute;padding:11px;border-radius:8px;box-shadow:0 8px 22px #0006;max-width:calc(100% - 16px)}
+.promo-card strong{display:block;font-size:1.05rem}
+.promo-card p{margin:4px 0 8px;font-size:.82rem}
+.promo-title{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:5px}
+.sticky-promo{left:7px;bottom:7px;display:flex;padding:0;background:#e5edf2;color:#223f52}
+.sticky-promo .promo-action{background:none;border:0}
+.modal-promo{pointer-events:auto;position:absolute;inset:0;display:grid;place-items:center;background:#142130ba;padding:14px}
+.modal-promo .promo-card{position:relative;width:min(100%,375px);background:#5e1c6c;color:white;padding:15px}
+.modal-promo .promo-card strong{font-size:1.42rem}
+.slide-promo{right:7px;bottom:53px;background:#fff;color:#263047;border:1px solid #a5adba;width:285px;animation:slide .45s ease-out}
 @keyframes slide{from{transform:translateY(115%)}}
-.moving-ad{right:10px;top:64px;color:#31135b;background:linear-gradient(130deg,#ffdc55,#ff90d2 50%,#9affed);width:250px;animation:travel 2.6s ease-in-out infinite alternate}
+.moving-promo{right:10px;top:64px;color:#31135b;background:linear-gradient(130deg,#ffdc55,#ff90d2 50%,#9affed);width:250px;animation:travel 2.6s ease-in-out infinite alternate}
 @keyframes travel{0%{transform:translate(0,0) rotate(-6deg)}100%{transform:translate(-28px,56px) rotate(6deg)}}
 .virus{border:2px outset #dce5ef;background:#e2e7ef;color:#171722;padding:0;width:230px;border-radius:2px;animation:arrive .16s ease-out}
-.virus .ad-head{background:#12469e;color:#fff;padding:3px 4px 3px 7px;font:700 .76rem/1.3 monospace;margin:0}
-.virus .ad-close{border-radius:0;min-width:27px;min-height:27px}
+.virus .promo-title{background:#12469e;color:#fff;padding:3px 4px 3px 7px;font:700 .76rem/1.3 monospace;margin:0}
+.virus .promo-close{border-radius:0;min-width:27px;min-height:27px}
 .virus .body{padding:7px}
 .virus .body strong{color:#8d1725;font-size:.82rem}
-.virus .ad-action{font-size:.73rem;padding:3px 7px}
-@media(max-width:690px){.top,.stage{padding-inline:10px}.moving-ad{width:206px}}
+.virus .promo-action{font-size:.73rem;padding:3px 7px}
+@media(max-width:690px){.top,.stage{padding-inline:10px}.moving-promo{width:206px}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;scroll-behavior:auto!important}}
 .stage.playing{grid-template-columns:minmax(0,300px) minmax(0,410px);justify-content:center;align-items:start}
 .pc{width:100%;justify-self:center}
@@ -107,17 +107,17 @@ h2{font-size:1.04rem;margin-bottom:8px}
 .app-switch button{flex:1;background:#253841;color:#fff;border:1px solid #53636a;border-radius:8px;padding:8px 5px;font-weight:750}
 .app-switch button[aria-pressed="true"]{background:#d4f99b;color:#15291e;border-color:#d4f99b}
 /* 動く広告。揺れの間隔は nudge の秒数で調整できます。 */
-.sticky-ad .ad-action{animation:nudge 4.2s ease-in-out infinite}
+.sticky-promo .promo-action{animation:nudge 4.2s ease-in-out infinite}
 @keyframes nudge{0%,69%,91%,100%{transform:translateY(0)}74%,85%{transform:translateY(-5px)}79%{transform:translateY(3px)}}
-.tiny-ad{right:7px;top:94px;width:230px;background:#fffdf7;color:#233b4a;border:1px solid #a3aeb4}
-.tiny-ad .ad-close{min-width:0;min-height:0;width:15px;height:15px;padding:0;font-size:11px}
-.gross-ad{left:7px;bottom:53px;width:256px;background:#eafea7;color:#26371c;border:2px solid #546625}
-.gross-ad strong{font-size:1.22rem}
-.video-ad{right:7px;bottom:53px;width:260px;background:#191b27;color:#fff}
-.video-ad .ad-action{display:block}
-.video-ad .ad-close{min-width:50px}
-.cookies-ad{left:7px;bottom:7px;width:calc(100% - 14px);background:white;color:#1c3144;border:1px solid #8695a6}
-.cookies-ad .ad-close{min-height:24px;font-size:.7rem;background:transparent;border:0;text-decoration:underline;color:#475a69}
+.tiny-promo{right:7px;top:94px;width:230px;background:#fffdf7;color:#233b4a;border:1px solid #a3aeb4}
+.tiny-promo .promo-close{min-width:0;min-height:0;width:15px;height:15px;padding:0;font-size:11px}
+.gross-promo{left:7px;bottom:53px;width:256px;background:#eafea7;color:#26371c;border:2px solid #546625}
+.gross-promo strong{font-size:1.22rem}
+.video-promo{right:7px;bottom:53px;width:260px;background:#191b27;color:#fff}
+.video-promo .promo-action{display:block}
+.video-promo .promo-close{min-width:50px}
+.cookies-promo{left:7px;bottom:7px;width:calc(100% - 14px);background:white;color:#1c3144;border:1px solid #8695a6}
+.cookies-promo .promo-close{min-height:24px;font-size:.7rem;background:transparent;border:0;text-decoration:underline;color:#475a69}
 /* スマホでは data-app に応じて片方の画面だけを表示します。 */
 @media(max-width:690px){
   .stage.playing{grid-template-columns:minmax(0,410px);padding-bottom:66px}
@@ -131,29 +131,29 @@ h2{font-size:1.04rem;margin-bottom:8px}
 @keyframes app-in{from{transform:translateY(12px) scale(.98);opacity:.5}}
 
 .scroll.is-locked{overflow:hidden;touch-action:none}
-.modal-ad{z-index:3;touch-action:none}
-.support-ad{right:9px;bottom:57px;width:260px;background:#e6f7ff;color:#183852;border:1px solid #4781a0}
-.survey-ad{right:8px;top:72px;width:265px;background:#fff;color:#44284c;border:2px solid #a666af}
-.survey-ad .ad-action{margin:3px 4px 0 0}
-.install-ad{left:7px;bottom:7px;width:calc(100% - 14px);background:#17304c;color:white;border:1px solid #75a5d1}
-.next-ad{background:transparent}
-.related-heading{margin:12px 0 0}
-/* 画像広告のサイズ。画像ファイルは ads/ フォルダーに入っています。 */
-.ad-photo{display:block;width:100%;height:auto;aspect-ratio:2.4/1;object-fit:cover;object-position:center 35%;border-radius:4px;margin:5px 0}
-.native .ad-photo{margin-top:7px}
-.photo-ad{bottom:53px;right:7px;width:310px;background:#fff;color:#173648;border:1px solid #8096a3}
-.photo-ad .photo-button{width:100%;padding:0;border:0;background:none;text-align:left;color:inherit}
-.photo-ad .photo-button strong{padding:2px 0;color:#184364}
-.photo-ad .photo-button:hover strong{text-decoration:underline}
+.modal-promo{z-index:3;touch-action:none}
+.support-promo{right:9px;bottom:57px;width:260px;background:#e6f7ff;color:#183852;border:1px solid #4781a0}
+.survey-promo{right:8px;top:72px;width:265px;background:#fff;color:#44284c;border:2px solid #a666af}
+.survey-promo .promo-action{margin:3px 4px 0 0}
+.install-promo{left:7px;bottom:7px;width:calc(100% - 14px);background:#17304c;color:white;border:1px solid #75a5d1}
+.next-promo{background:transparent}
+.story-links-title{margin:12px 0 0}
+/* 画像広告のサイズ。画像ファイルは media/ フォルダーに入っています。 */
+.promo-photo{display:block;width:100%;height:auto;aspect-ratio:2.4/1;object-fit:cover;object-position:center 35%;border-radius:4px;margin:5px 0}
+.native .promo-photo{margin-top:7px}
+.photo-promo{bottom:53px;right:7px;width:310px;background:#fff;color:#173648;border:1px solid #8096a3}
+.photo-promo .photo-button{width:100%;padding:0;border:0;background:none;text-align:left;color:inherit}
+.photo-promo .photo-button strong{padding:2px 0;color:#184364}
+.photo-promo .photo-button:hover strong{text-decoration:underline}
 
-a.native,a.ad-action,a.photo-button{display:block;text-decoration:none}
-a.ad-action{display:inline-block}
+a.native,a.promo-action,a.photo-button{display:block;text-decoration:none}
+a.promo-action{display:inline-block}
 .link-toast{z-index:2;bottom:7px;left:7px;width:calc(100% - 14px);background:#fff;color:#253d4d;border:1px solid #8d9eab;animation:slide .42s ease-out}
-.link-toast .ad-head{margin-bottom:3px}
+.link-toast .promo-title{margin-bottom:3px}
 .link-toast a{display:block;color:#244f72;text-underline-offset:3px}
-.runaway-modal .ad-card{position:relative;overflow:hidden;padding-right:52px}
-.runaway-modal .ad-head{min-height:32px}
-.runaway-modal .ad-close{position:absolute;z-index:1;top:14px;right:12px}
+.runaway-modal .promo-card{position:relative;overflow:hidden;padding-right:52px}
+.runaway-modal .promo-title{min-height:32px}
+.runaway-modal .promo-close{position:absolute;z-index:1;top:14px;right:12px}
 @media(prefers-reduced-motion:reduce){.link-toast{animation:none}}
 </style>
 </head>
@@ -173,7 +173,7 @@ a.ad-action{display:inline-block}
   <section id="pc" class="pc" aria-label="PCのブラウザー" hidden>
     <div class="chrome">
       <button type="button" id="back" aria-label="前のページへ戻る" disabled>←</button>
-      <div id="address" class="address"></div>
+      <div id="address" class="location-bar"></div>
     </div>
     <div class="screen" id="screen">
       <div class="scroll" id="scroll">
@@ -181,7 +181,7 @@ a.ad-action{display:inline-block}
         <nav class="nav" id="sections" aria-label="ニュースのカテゴリ"></nav>
         <article id="page" aria-label="夕刊みなとの記事"></article>
       </div>
-      <!-- ニュースの上に表示する広告。クリック先は ad-pages/ にあります。 -->
+      <!-- ニュースの上に表示する広告。クリック先は offers/ にあります。 -->
       <div class="layer" id="layer" aria-label="サイト内広告"></div>
     </div>
   </section>
@@ -327,7 +327,7 @@ const ads = {
   toothbrush:['ソニック歯ブラシ研究所','歯みがきの時間をスマホで確認できる、架空の電動歯ブラシです。','電動歯ブラシ 期間限定セール'],
   virus:['パソコン元気堂','「お使いのPC」はゲーム内の画面です。こちらは偽警告から誘導された架空の広告です。','今すぐ修復']
 };
-// 画像付き商品を増やすときは、ads と adImages に同じIDを追加し、画像を ads/ に置きます。
+// 画像付き商品を増やすときは、ads と adImages に同じIDを追加し、画像を media/ に置きます。
 const adImages = {
   insurance:'insurance.webp',
   career:'career.webp',
@@ -439,7 +439,7 @@ function switchApp(app) {
 }
 function revealPc() {
   switchApp('news');
-  const target = layer.querySelector('.modal-ad .ad-close') ?? page.querySelector('h1');
+  const target = layer.querySelector('.modal-promo .promo-close') ?? page.querySelector('h1');
   target.focus({preventScroll:true});
 }
 function start() {
@@ -458,8 +458,8 @@ function start() {
 // 新しいタブはブラウザー標準のリンクで開きます。広告IDと同名のHTMLを用意してください。
 function adLink(className, id, text) {
   const link = element('a', className, text);
-  link.dataset.ad = id;
-  link.href = 'ad-pages/' + id + '.html';
+  link.dataset.offer = id;
+  link.href = 'offers/' + id + '.html';
   link.target = '_blank';
   link.rel = 'noopener noreferrer';
   return link;
@@ -505,7 +505,7 @@ function buildPage(id) {
     const paragraphs = article.paragraphs.map(text => element('p', '', text.replace(/\{(\d+)\}/g, (_, index) => roundAnswers[id][index])));
     story.append(paragraphs[0], slot, ...paragraphs.slice(1));
     page.append(story);
-    if (article.related.length) page.append(element('h2', 'related-heading', '関連記事'), ...article.related.map(newsRow));
+    if (article.related.length) page.append(element('h2', 'story-links-title', '関連記事'), ...article.related.map(newsRow));
     return;
   }
   const ids = category ? feed.filter(key => articles[key].category === category) : feed;
@@ -524,7 +524,7 @@ function render(restore = false) {
     const candidates = Math.random() < 0.65 ? photoAdIds : ['gate','map','lottery','gross'];
     const adId = candidates[randomInt(0, candidates.length - 1)];
     const item = adLink('native', adId);
-    item.append(element('span', 'ad-label', '広告'));
+    item.append(element('span', 'promo-label', '広告'));
     if (adImages[adId]) item.append(makeAdPhoto(adId));
     item.append(element('strong', '', ads[adId][2]), element('small', '', ads[adId][0]));
     slot.append(item);
@@ -550,7 +550,7 @@ function back() {
   render(true);
 }
 function closeButton(label, remove, escapes = 0) {
-  const item = button('ad-close', '×');
+  const item = button('promo-close', '×');
   item.setAttribute('aria-label', label);
   item.addEventListener('click', event => {
     if (event.detail > 0 && escapes > 0) {
@@ -563,7 +563,7 @@ function closeButton(label, remove, escapes = 0) {
 }
 // 「閉じる」が押されると、カードの内側で二回転しながら反対の角へ飛びます。
 function dodgeCloseButton(item, escapes) {
-  const card = item.closest('.ad-card');
+  const card = item.closest('.promo-card');
   const fromX = item.offsetLeft;
   const fromY = item.offsetTop;
   const maxX = card.clientWidth - item.offsetWidth - 12;
@@ -584,16 +584,16 @@ function dodgeCloseButton(item, escapes) {
   ], {duration:520, easing:'cubic-bezier(.2,.7,.25,1)'});
 }
 function adHeader(title, close) {
-  const header = element('div', 'ad-head');
+  const header = element('div', 'promo-title');
   header.append(element('span', '', title), close);
   return header;
 }
 function adAction(id, text = ads[id][2]) {
-  return adLink('ad-action', id, text);
+  return adLink('promo-action', id, text);
 }
 function makeAdPhoto(id) {
-  const image = element('img', 'ad-photo');
-  image.src = 'ads/' + adImages[id];
+  const image = element('img', 'promo-photo');
+  image.src = 'media/' + adImages[id];
   image.alt = '';
   return image;
 }
@@ -604,9 +604,9 @@ function hasPopupRoom() {
 }
 function spawnPhotoAd() {
   if (!hasPopupRoom()) return;
-  if (layer.querySelector('.photo-ad')) return;
+  if (layer.querySelector('.photo-promo')) return;
   const id = photoAdIds[randomInt(0, photoAdIds.length - 1)];
-  const card = element('div', 'ad-card photo-ad');
+  const card = element('div', 'promo-card photo-promo');
   card.dataset.transient = '';
   const creative = adLink('photo-button', id);
   creative.append(makeAdPhoto(id), element('strong', '', ads[id][2]));
@@ -616,14 +616,14 @@ function spawnPhotoAd() {
 // 記事やカテゴリのリンクを押した直後だけ出る広告。閉じるまで画面下に残ります。
 function spawnLinkToast() {
   if (!hasPopupRoom() || finished || layer.querySelector('.link-toast') || Math.random() >= settings.adFrequency) return;
-  const card = element('div', 'ad-card link-toast');
+  const card = element('div', 'promo-card link-toast');
   const close = closeButton('トースト広告を閉じる', () => card.remove());
   card.append(adHeader('スポンサーからのお知らせ', close), adLink('', 'linkToast', ads.linkToast[2]));
   layer.append(card);
 }
 function spawnSticky() {
-  if (!hasPopupRoom() || layer.querySelector('.sticky-ad')) return;
-  const item = element('div', 'ad-card sticky-ad');
+  if (!hasPopupRoom() || layer.querySelector('.sticky-promo')) return;
+  const item = element('div', 'promo-card sticky-promo');
   item.append(adAction('map', '会場マップ　広告'), closeButton('追従バナーを閉じる', () => item.remove()));
   layer.append(item);
 }
@@ -678,8 +678,8 @@ function spawnCard(kind) {
     cookies:['cookies','プライバシー設定','クッキーを許可しますか？','あなたにぴったりの広告を決めるために使います。']
   }[kind];
   const [id, label, title, copy] = config;
-  const wrapper = isModal ? element('div', kind === 'modal' ? 'modal-ad runaway-modal' : 'modal-ad') : null;
-  const card = element('div', 'ad-card ' + (isModal ? '' : kind + '-ad'));
+  const wrapper = isModal ? element('div', kind === 'modal' ? 'modal-promo runaway-modal' : 'modal-promo') : null;
+  const card = element('div', 'promo-card ' + (isModal ? '' : kind + '-promo'));
   const top = wrapper ?? card;
   top.dataset.transient = '';
   top.dataset.kind = kind;
@@ -728,7 +728,7 @@ function spawnBurst() {
     const id = later(() => {
       if (burst !== batch) return;
       batch.spawned++;
-      const card = element('div', 'ad-card virus');
+      const card = element('div', 'promo-card virus');
       card.dataset.transient = '';
       const maxX = Math.max(0, layer.clientWidth - 236);
       const maxY = Math.max(0, layer.clientHeight - 126);
@@ -737,7 +737,7 @@ function spawnBurst() {
       const close = closeButton('警告ウィンドウを閉じる', () => {
         card.remove();
         const remaining = layer.querySelectorAll('.virus');
-        if (remaining.length) remaining[remaining.length - 1].querySelector('.ad-close').focus({preventScroll:true});
+        if (remaining.length) remaining[remaining.length - 1].querySelector('.promo-close').focus({preventScroll:true});
         else {
           if (batch.spawned === batch.total) stopBurst();
           page.querySelector('h1').focus({preventScroll:true});
@@ -755,15 +755,15 @@ function shiftArticle(kind) {
   const slot = page.querySelector('[data-slot="inline"]');
   if (slot.querySelector('[data-delayed]')) return;
   const id = kind === 'next' ? 'next' : 'gate';
-  const item = adLink(kind === 'next' ? 'native next-ad' : 'native', id);
+  const item = adLink(kind === 'next' ? 'native next-promo' : 'native', id);
   item.dataset.delayed = '';
-  item.append(element('span', 'ad-label', '広告'), element('strong', '', ads[id][2]));
+  item.append(element('span', 'promo-label', '広告'), element('strong', '', ads[id][2]));
   slot.prepend(item);
 }
 // タイマー広告は全種をランダムに並べて1回ずつ消化し、その後また並べ直します。
 function scheduleAd(delay) {
   later(() => {
-    if (burst || layer.querySelector('.modal-ad')) {
+    if (burst || layer.querySelector('.modal-promo')) {
       scheduleAd(1200);
       return;
     }
@@ -872,23 +872,23 @@ function normalizeTime(raw) {
 scroll.addEventListener('scroll', tryScrollAd, {passive:true});
 get('sections').append(siteLink('home','トップ'), ...Object.entries(categories).map(([id, label]) => siteLink(id,label)));
 pc.addEventListener('click', event => {
-  const item = event.target.closest('[data-page], [data-ad]');
+  const item = event.target.closest('[data-page], [data-offer]');
   if (!item) return;
   if (item.dataset.page) {
     event.preventDefault();
     navigate(item.dataset.page);
     spawnLinkToast();
   }
-  if (item.dataset.ad) countAdClick();
+  if (item.dataset.offer) countAdClick();
 });
 pc.addEventListener('auxclick', event => {
-  if (event.button === 1 && event.target.closest('[data-ad]')) countAdClick();
+  if (event.button === 1 && event.target.closest('[data-offer]')) countAdClick();
 });
 pc.addEventListener('keydown', event => {
-  if (event.key === 'Escape') layer.querySelector('.modal-ad .ad-close')?.click();
+  if (event.key === 'Escape') layer.querySelector('.modal-promo .promo-close')?.click();
 });
 get('back').addEventListener('click', () => {
-  if (lockedScrollTop !== null) layer.querySelector('.modal-ad .ad-close')?.click();
+  if (lockedScrollTop !== null) layer.querySelector('.modal-promo .promo-close')?.click();
   else back();
 });
 get('app-chat').addEventListener('click', () => switchApp('chat'));
